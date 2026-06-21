@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monthly Calendar Agenda</title>
+  <title>Kaunroy Kalendar Drive</title>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <style>
     :root, [data-theme="light"] {
@@ -26,12 +26,15 @@
       --color-border: #d4d1ca;
       --color-divider: #dcd9d5;
       --color-text: #28251d;
-      --color-text-muted: #7a7974;
+      --color-text-muted: #6f6c65;
       --color-text-faint: #bab9b4;
       --color-text-inverse: #f9f8f4;
       --color-primary: #01696f;
       --color-primary-hover: #0c4e54;
       --color-primary-highlight: #dce8e6;
+      --color-success: #2f6b28;
+      --color-warning: #8a5717;
+      --color-error: #8f2b62;
       --shadow-sm: 0 1px 2px rgba(40, 37, 29, 0.06);
       --shadow-md: 0 6px 18px rgba(40, 37, 29, 0.08);
       --radius-sm: 0.5rem;
@@ -50,12 +53,15 @@
       --color-border: #393836;
       --color-divider: #262523;
       --color-text: #cdccca;
-      --color-text-muted: #9a9996;
+      --color-text-muted: #afada8;
       --color-text-faint: #666563;
       --color-text-inverse: #171614;
       --color-primary: #4f98a3;
       --color-primary-hover: #227f8b;
       --color-primary-highlight: #25373a;
+      --color-success: #77ad54;
+      --color-warning: #d39a47;
+      --color-error: #d163a7;
       --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
       --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.35);
     }
@@ -72,10 +78,11 @@
 
     button, input, textarea { font: inherit; color: inherit; }
     button { cursor: pointer; border: none; background: none; }
+    a { color: inherit; }
     :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 
     .page {
-      width: min(1200px, calc(100% - 2rem));
+      width: min(1240px, calc(100% - 2rem));
       margin: 0 auto;
       padding: var(--space-6) 0;
     }
@@ -83,20 +90,99 @@
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: var(--space-4);
       margin-bottom: var(--space-6);
       flex-wrap: wrap;
     }
 
-    .brand h1 { font-size: var(--text-xl); line-height: 1.1; margin-bottom: var(--space-1); }
-    .brand p { font-size: var(--text-sm); color: var(--color-text-muted); }
-    .top-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .brand {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .brand-mark svg {
+      width: 2rem;
+      height: 2rem;
+      color: var(--color-primary);
+      flex: 0 0 auto;
+    }
+
+    .brand h1 { font-size: var(--text-xl); line-height: 1.1; }
+    .brand p { font-size: var(--text-sm); color: var(--color-text-muted); max-width: 70ch; }
+
+    .top-actions, .sync-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .toolbar-card {
+      display: grid;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+      padding: var(--space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .status-wrap {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 2.25rem;
+      padding: 0 var(--space-3);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-2);
+      font-size: var(--text-sm);
+    }
+
+    .status-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: var(--color-text-faint);
+      flex: 0 0 auto;
+    }
+
+    .status-pill.success .status-dot { background: var(--color-success); }
+    .status-pill.warning .status-dot { background: var(--color-warning); }
+    .status-pill.error .status-dot { background: var(--color-error); }
+
+    .meta-note {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
 
     .icon-btn, .nav-btn, .action-btn, .mobile-switch {
       min-height: 44px;
       border-radius: var(--radius-md);
-      transition: background var(--transition), color var(--transition), border-color var(--transition);
+      transition: background var(--transition), color var(--transition), border-color var(--transition), opacity var(--transition);
     }
 
     .icon-btn {
@@ -123,6 +209,7 @@
 
     .icon-btn:hover, .nav-btn:hover, .action-btn:hover, .mobile-switch:hover { background: var(--color-surface-offset); }
     .action-btn.primary:hover, .mobile-switch.active:hover { background: var(--color-primary-hover); }
+    .action-btn:disabled, .icon-btn:disabled, .nav-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .calendar-card {
       background: var(--color-surface);
@@ -247,6 +334,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity var(--transition);
+      z-index: 15;
     }
 
     .drawer {
@@ -287,9 +375,9 @@
       align-content: start;
     }
 
-    .agenda-list { display: grid; gap: var(--space-3); }
+    .agenda-list, .helper-list { display: grid; gap: var(--space-3); }
 
-    .day-summary {
+    .day-summary, .helper-card {
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       padding: var(--space-3);
@@ -297,6 +385,10 @@
       display: grid;
       gap: var(--space-2);
     }
+
+    .helper-card h3 { font-size: var(--text-base); }
+    .helper-card p, .helper-card li { font-size: var(--text-sm); color: var(--color-text-muted); }
+    .helper-card ul { padding-left: 1.1rem; display: grid; gap: 0.35rem; }
 
     .empty-state {
       border: 1px dashed var(--color-border);
@@ -359,6 +451,7 @@
     }
 
     .muted { color: var(--color-text-muted); font-size: var(--text-xs); }
+    .hidden { display: none !important; }
 
     @media (max-width: 860px) {
       .page { width: min(100%, calc(100% - 1rem)); padding: var(--space-4) 0; }
@@ -370,7 +463,7 @@
     }
 
     @media (max-width: 640px) {
-      .topbar, .calendar-header { align-items: flex-start; }
+      .topbar, .calendar-header, .toolbar-row { align-items: flex-start; }
       .calendar-header { flex-direction: column; }
       .calendar-nav { width: 100%; justify-content: space-between; }
       .mobile-view-toggle { display: flex; }
@@ -380,23 +473,65 @@
       .drawer-head, .drawer-subhead, .drawer-body, .drawer-footer { padding-inline: var(--space-4); }
       .drawer-footer > button { flex: 1 1 0; }
       .checklist-input-row { flex-direction: column; align-items: stretch; }
+      .sync-actions, .top-actions { width: 100%; }
+      .sync-actions > button, .top-actions > button { flex: 1 1 auto; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; }
     }
   </style>
+  <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </head>
 <body>
   <main class="page">
-    <div class="topbar">
+    <header class="topbar">
       <div class="brand">
-        <h1>KAUNROY KALENDAR</h1>
+        <div class="brand-mark">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Kaunroy Kalendar logo">
+            <rect x="10" y="12" width="44" height="42" rx="10" stroke="currentColor" stroke-width="4"></rect>
+            <path d="M20 8v12M44 8v12M18 26h28M24 34h7M24 44h16M41 34h0" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
+            <circle cx="44" cy="34" r="4" fill="currentColor"></circle>
+          </svg>
+          <h1>KAUNROY KALENDAR</h1>
+        </div>
+        <p>Google Drive synced monthly agenda calendar. Sign in, choose or create a Drive file, and keep the same agenda across devices. Open this app from the GitHub Pages origin to use Google sign-in.</p>
       </div>
       <div class="top-actions">
+        <button class="action-btn" type="button" id="signInBtn">Sign in with Google</button>
+        <button class="action-btn hidden" type="button" id="signOutBtn">Sign out</button>
         <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme"><span aria-hidden="true">☾</span></button>
       </div>
-    </div>
+    </header>
+
+    <section class="toolbar-card" aria-label="Drive sync controls">
+      <div class="toolbar-row">
+        <div class="status-wrap">
+          <div class="status-pill warning" id="authStatus"><span class="status-dot"></span><span>Not signed in</span></div>
+          <div class="status-pill" id="fileStatus"><span class="status-dot"></span><span>No Drive file selected</span></div>
+        </div>
+        <div class="sync-actions">
+          <button class="action-btn" type="button" id="pickDriveFileBtn" disabled>Choose from Drive</button>
+          <button class="action-btn" type="button" id="createDriveFileBtn" disabled>Create Drive file</button>
+          <button class="action-btn primary" type="button" id="syncNowBtn" disabled>Sync now</button>
+        </div>
+      </div>
+      <div class="toolbar-row">
+        <p class="meta-note" id="syncMeta">Use Google sign-in first. After that, you can pick an existing JSON file from Drive or create one named kaunroy-kalendar.json. If sign-in fails, confirm the app is opened from https://royabhishek99.github.io and that your test user is added in the OAuth consent screen.</p>
+      </div>
+    </section>
+
+    <section class="helper-list" style="margin-bottom: 1.25rem;">
+      <article class="helper-card">
+        <h3>First-time setup</h3>
+        <ul>
+          <li>Open this page from your GitHub Pages URL, not a local file.</li>
+          <li>In Google Cloud, add <strong>https://royabhishek99.github.io</strong> as an authorized JavaScript origin.</li>
+          <li>If sign-in fails, verify that the test user includes royabhishek.roy42@gmail.com and that Drive API plus Google Picker API are enabled.</li>
+        </ul>
+      </article>
+    </section>
 
     <section class="calendar-card" aria-label="Monthly agenda calendar">
       <div class="calendar-header">
@@ -407,7 +542,7 @@
         </div>
       </div>
 
-      <div class="mobile-view-toggle" id="mobileViewToggle" aria-label="Mobile calendar view switch">
+      <div class="mobile-view-toggle" aria-label="Mobile calendar view switch">
         <button class="mobile-switch active" type="button" data-mobile-view="list">List view</button>
         <button class="mobile-switch" type="button" data-mobile-view="compact">Compact view</button>
       </div>
@@ -451,7 +586,7 @@
           <button class="action-btn primary" type="button" id="addCheckItem">Add item</button>
         </div>
         <div class="checklist-items" id="checklistItems"></div>
-        <p class="muted">Add all the items that need to be done on this day, then save the list.</p>
+        <p class="muted">After editing, click Save to update the selected Drive file.</p>
       </section>
     </div>
     <div class="drawer-footer">
@@ -461,6 +596,18 @@
   </aside>
 
   <script>
+    const ALLOWED_ORIGIN = 'https://royabhishek99.github.io';
+
+const CONFIG = {
+      CLIENT_ID: '739444126333-blf0rcqstihkgt52dv9tffonti4g1074.apps.googleusercontent.com',
+      API_KEY: 'AIzaSyBgbv79vW15Tr-tLHcZrlKX2Gl9B7JbLz4',
+      APP_ID: '739444126333',
+      DISCOVERY_DOC: 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
+      DRIVE_SCOPE: 'https://www.googleapis.com/auth/drive.file',
+      PICKER_SCOPE: 'https://www.googleapis.com/auth/drive.file',
+      DEFAULT_FILE_NAME: 'kaunroy-kalendar.json',
+    };
+
     const monthLabel = document.getElementById('monthLabel');
     const calendarGrid = document.getElementById('calendarGrid');
     const mobileCalendarGrid = document.getElementById('mobileCalendarGrid');
@@ -479,29 +626,99 @@
     const nextMonthBtn = document.getElementById('nextMonth');
     const themeToggle = document.querySelector('[data-theme-toggle]');
     const mobileSwitches = Array.from(document.querySelectorAll('[data-mobile-view]'));
+    const signInBtn = document.getElementById('signInBtn');
+
+    if (window.location.origin !== ALLOWED_ORIGIN) {
+      setMeta(`Open this app from ${ALLOWED_ORIGIN} to use Google sign-in. The current preview origin is ${window.location.origin}.`);
+    }
+    const signOutBtn = document.getElementById('signOutBtn');
+    const pickDriveFileBtn = document.getElementById('pickDriveFileBtn');
+    const createDriveFileBtn = document.getElementById('createDriveFileBtn');
+    const syncNowBtn = document.getElementById('syncNowBtn');
+    const authStatus = document.getElementById('authStatus');
+    const fileStatus = document.getElementById('fileStatus');
+    const syncMeta = document.getElementById('syncMeta');
 
     const today = new Date();
+
+    const defaultAgendas = {
+      '2026-06-10': [
+        { text: 'Confirm videos to be made for June', done: false },
+        { text: 'Shortlist topics', done: true },
+        { text: 'Lock timeline', done: false }
+      ],
+      '2026-06-15': [
+        { text: 'Team sync', done: false },
+        { text: 'Discuss blockers', done: false },
+        { text: 'Prepare content outline', done: true }
+      ],
+      '2026-06-23': [
+        { text: 'Review campaign ideas', done: false }
+      ]
+    };
+
     const state = {
       currentMonth: new Date(2026, 5, 1),
       selectedDateKey: null,
       mobileView: 'list',
       draftChecklist: [],
-      agendas: {
-        '2026-06-10': [
-          { text: 'Confirm videos to be made for June', done: false },
-          { text: 'Shortlist topics', done: true },
-          { text: 'Lock timeline', done: false }
-        ],
-        '2026-06-15': [
-          { text: 'Team sync', done: false },
-          { text: 'Discuss blockers', done: false },
-          { text: 'Prepare content outline', done: true }
-        ],
-        '2026-06-23': [
-          { text: 'Review campaign ideas', done: false }
-        ]
+      agendas: structuredClone(defaultAgendas),
+      google: {
+        gapiInited: false,
+        gisInited: false,
+        pickerInited: false,
+        tokenClient: null,
+        accessToken: null,
+        fileId: null,
+        fileName: null,
+        filePicked: false,
+        pickerLoaded: false,
+        signedInEmail: null,
+        saving: false
       }
     };
+
+    carryForwardIncompleteTasks();
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function setStatus(element, tone, text) {
+      element.className = `status-pill ${tone}`.trim();
+      element.innerHTML = `<span class="status-dot"></span><span>${escapeHtml(text)}</span>`;
+    }
+
+    function setMeta(text) {
+      syncMeta.textContent = text;
+    }
+
+    function updateControlState() {
+      const signedIn = Boolean(state.google.accessToken);
+      signInBtn.classList.toggle('hidden', signedIn);
+      signOutBtn.classList.toggle('hidden', !signedIn);
+      pickDriveFileBtn.disabled = !signedIn;
+      createDriveFileBtn.disabled = !signedIn;
+      syncNowBtn.disabled = !signedIn || !state.google.fileId || state.google.saving;
+      saveAgendaBtn.disabled = !signedIn || !state.google.fileId || state.google.saving;
+
+      if (!signedIn) {
+        setStatus(authStatus, 'warning', 'Not signed in');
+      } else {
+        setStatus(authStatus, 'success', state.google.signedInEmail ? `Signed in as ${state.google.signedInEmail}` : 'Signed in');
+      }
+
+      if (!state.google.fileId) {
+        setStatus(fileStatus, signedIn ? 'warning' : '', 'No Drive file selected');
+      } else {
+        setStatus(fileStatus, 'success', `Using ${state.google.fileName || CONFIG.DEFAULT_FILE_NAME}`);
+      }
+    }
 
     function formatDateKey(date) {
       const year = date.getFullYear();
@@ -511,7 +728,9 @@
     }
 
     function formatReadableDate(date) {
-      return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(date);
+      return new Intl.DateTimeFormat('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+      }).format(date);
     }
 
     function getMonthTitle(date) {
@@ -540,7 +759,6 @@
     function renderDesktopCalendar() {
       const month = state.currentMonth.getMonth();
       calendarGrid.innerHTML = '';
-
       getGridDates().forEach((date) => {
         const dateKey = formatDateKey(date);
         const items = state.agendas[dateKey] || [];
@@ -558,7 +776,7 @@
             <span class="agenda-count">${items.length ? `${items.length} item${items.length > 1 ? 's' : ''}` : ''}</span>
           </div>
           <div class="agenda-preview">
-            ${items.length ? items.slice(0, 2).map(item => `<span class="agenda-chip">${item.carryForward ? 'Carry forwarded task: ' : ''}${item.done ? '☑' : '☐'} ${escapeHtml(item.text)}</span>`).join('') : '<span class="agenda-chip more">No agenda</span>'}
+            ${items.length ? items.slice(0, 2).map(item => `<span class="agenda-chip">${item.done ? '☑' : '☐'} ${escapeHtml(item.text)}</span>`).join('') : '<span class="agenda-chip more">No agenda</span>'}
             ${items.length > 2 ? `<span class="agenda-chip more">+${items.length - 2} more</span>` : ''}
           </div>
         `;
@@ -570,7 +788,6 @@
     function renderMobileCalendar() {
       const month = state.currentMonth.getMonth();
       mobileCalendarGrid.innerHTML = '';
-
       getGridDates().forEach((date) => {
         const dateKey = formatDateKey(date);
         const items = state.agendas[dateKey] || [];
@@ -587,7 +804,7 @@
           ? `<div class="mobile-meta"><span class="mobile-weekday">${new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date)}</span><span class="agenda-count">${items.length} item${items.length !== 1 ? 's' : ''}</span></div>`
           : `
             <div class="mobile-agenda-preview">
-              ${items.length ? items.slice(0, 2).map(item => `<span class="mobile-agenda-chip">${item.carryForward ? 'Carry forwarded task: ' : ''}${item.done ? '☑' : '☐'} ${escapeHtml(item.text)}</span>`).join('') : '<span class="mobile-agenda-chip more">No agenda yet</span>'}
+              ${items.length ? items.slice(0, 2).map(item => `<span class="mobile-agenda-chip">${item.done ? '☑' : '☐'} ${escapeHtml(item.text)}</span>`).join('') : '<span class="mobile-agenda-chip more">No agenda yet</span>'}
               ${items.length > 2 ? `<span class="mobile-agenda-chip more">+${items.length - 2} more</span>` : ''}
             </div>
           `;
@@ -613,7 +830,6 @@
 
     function renderChecklistItems() {
       checklistItems.innerHTML = '';
-
       if (!state.draftChecklist.length) {
         checklistItems.innerHTML = '<div class="empty-state">No agenda items yet. Add one above.</div>';
         return;
@@ -624,7 +840,7 @@
         row.className = `checklist-item${item.done ? ' done' : ''}`;
         row.innerHTML = `
           <input type="checkbox" ${item.done ? 'checked' : ''} aria-label="Mark agenda item" />
-          <span>${item.carryForward ? 'Carry forwarded task: ' : ''}${escapeHtml(item.text)}</span>
+          <span>${escapeHtml(item.text)}</span>
           <button class="remove-check-btn" type="button" aria-label="Remove agenda item">✕</button>
         `;
 
@@ -651,7 +867,6 @@
     function renderAgendaList() {
       const items = state.draftChecklist;
       agendaList.innerHTML = '';
-
       if (!items.length) {
         agendaList.innerHTML = '<div class="empty-state">No agenda list for this day yet.</div>';
         clearDayAgendaBtn.disabled = true;
@@ -666,7 +881,7 @@
       summary.className = 'day-summary';
       summary.innerHTML = `
         <strong>${items.length} item${items.length > 1 ? 's' : ''} planned</strong>
-        <div class="mobile-agenda-preview">${items.map(item => `<span class="mobile-agenda-chip${item.done ? ' more' : ''}">${item.carryForward ? 'Carry forwarded task: ' : ''}${item.done ? '☑' : '☐'} ${escapeHtml(item.text)}</span>`).join('')}</div>
+        <div class="mobile-agenda-preview">${items.map(item => `<span class="mobile-agenda-chip${item.done ? ' more' : ''}">${item.done ? '☑' : '☐'} ${escapeHtml(item.text)}</span>`).join('')}</div>
       `;
       agendaList.appendChild(summary);
     }
@@ -692,21 +907,30 @@
       agendaDrawer.setAttribute('aria-hidden', 'true');
     }
 
-    function saveAgenda() {
+    async function saveAgenda() {
       if (!state.selectedDateKey) return;
+      if (!state.google.fileId) {
+        setMeta('Choose or create a Drive file first.');
+        return;
+      }
+
       if (state.draftChecklist.length) {
         state.agendas[state.selectedDateKey] = state.draftChecklist.map(item => ({ ...item }));
       } else {
         delete state.agendas[state.selectedDateKey];
       }
+
       renderCalendar();
       renderAgendaList();
+      await saveToDrive('Agenda saved to Google Drive.');
+      closeDrawer();
     }
 
     function clearDayAgenda() {
       state.draftChecklist = [];
       renderChecklistItems();
       renderAgendaList();
+      renderCalendar();
     }
 
     function addChecklistItem() {
@@ -715,34 +939,236 @@
         checkItemInput.focus();
         return;
       }
-      state.draftChecklist.push({ text, done: false, carryForward: false });
+      state.draftChecklist.push({ text, done: false });
       checkItemInput.value = '';
       renderChecklistItems();
       renderAgendaList();
       checkItemInput.focus();
     }
 
-    function hasAnyIncomplete(dateKey) {
-      return (state.agendas[dateKey] || []).some(item => !item.done);
+    function serializeAgendas() {
+      return JSON.stringify({
+        version: 1,
+        updatedAt: new Date().toISOString(),
+        agendas: state.agendas
+      }, null, 2);
     }
 
-    function carryForwardToNextDay(dateKey) {
-      const items = state.agendas[dateKey] || [];
-      const incomplete = items.filter(item => !item.done).map(item => ({ ...item, carryForward: true }));
-      if (!incomplete.length) return;
-      const date = new Date(`${dateKey}T00:00:00`);
-      date.setDate(date.getDate() + 1);
-      const nextKey = formatDateKey(date);
-      const nextExisting = state.agendas[nextKey] || [];
-      const merged = [...nextExisting];
-      incomplete.forEach(item => {
-        if (!merged.some(existing => existing.text === item.text && existing.carryForward)) merged.push(item);
+    function ingestDrivePayload(text) {
+      const parsed = JSON.parse(text);
+      const agendas = parsed && typeof parsed === 'object' && parsed.agendas && typeof parsed.agendas === 'object'
+        ? parsed.agendas
+        : parsed && typeof parsed === 'object'
+          ? parsed
+          : null;
+
+      if (!agendas || Array.isArray(agendas)) throw new Error('Drive file format is invalid. Expected an agenda object or { agendas }.');
+
+      state.agendas = agendas;
+      carryForwardIncompleteTasks();
+      if (state.selectedDateKey) state.draftChecklist = state.agendas[state.selectedDateKey].map(item => ({ ...item }));
+      renderChecklistItems();
+      renderAgendaList();
+      renderCalendar();
+    }
+
+    async function createDriveFile() {
+      try {
+        setMeta('Creating Drive file…');
+        const metadata = { name: CONFIG.DEFAULT_FILE_NAME, mimeType: 'application/json' };
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', new Blob([serializeAgendas()], { type: 'application/json' }));
+
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${state.google.accessToken}` },
+          body: form
+        });
+
+        if (!response.ok) {
+          throw new Error(`Drive create failed: ${response.status}`);
+        }
+
+        const result = await response.json();
+        state.google.fileId = result.id;
+        state.google.fileName = result.name || CONFIG.DEFAULT_FILE_NAME;
+        updateControlState();
+        setMeta(`Created ${state.google.fileName} in Google Drive.`);
+      } catch (error) {
+        console.error(error);
+        setStatus(fileStatus, 'error', 'Drive file creation failed');
+        setMeta(error.message || 'Could not create the Drive file.');
+      }
+    }
+
+    async function loadDriveFile(fileId, fileName) {
+      try {
+        setMeta('Loading agenda data from Drive…');
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`, {
+          headers: { Authorization: `Bearer ${state.google.accessToken}` }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Drive load failed: ${response.status}`);
+        }
+
+        const text = await response.text();
+        ingestDrivePayload(text);
+        state.google.fileId = fileId;
+        state.google.fileName = fileName || CONFIG.DEFAULT_FILE_NAME;
+        updateControlState();
+        setMeta(`Loaded agenda data from ${state.google.fileName}.`);
+      } catch (error) {
+        console.error(error);
+        setStatus(fileStatus, 'error', 'Drive file load failed');
+        setMeta(error.message || 'Could not load the Drive file.');
+      }
+    }
+
+    async function saveToDrive(successMessage = 'Drive sync complete.') {
+      if (!state.google.fileId || !state.google.accessToken) return;
+      state.google.saving = true;
+      updateControlState();
+      setMeta('Saving agenda data to Drive…');
+      try {
+        const response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(state.google.fileId)}?uploadType=media`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${state.google.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: serializeAgendas()
+        });
+
+        if (!response.ok) {
+          throw new Error(`Drive save failed: ${response.status}`);
+        }
+
+        setMeta(successMessage);
+      } catch (error) {
+        console.error(error);
+        setStatus(fileStatus, 'error', 'Drive sync failed');
+        setMeta(error.message || 'Could not save data to Drive.');
+      } finally {
+        state.google.saving = false;
+        updateControlState();
+      }
+    }
+
+    function maybeOpenPicker() {
+      if (!state.google.accessToken) {
+        setMeta('Sign in first.');
+        return;
+      }
+      if (!window.google || !google.picker) {
+        setMeta('Google Picker is still loading. Wait a moment and try again.');
+        return;
+      }
+
+      const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
+        .setIncludeFolders(false)
+        .setMimeTypes('application/json');
+
+      const picker = new google.picker.PickerBuilder()
+        .setAppId(CONFIG.APP_ID)
+        .setOAuthToken(state.google.accessToken)
+        .setDeveloperKey(CONFIG.API_KEY)
+        .addView(view)
+        .setTitle('Choose a calendar JSON file from Google Drive')
+        .setCallback((data) => {
+          if (data.action === google.picker.Action.PICKED) {
+            const doc = data.docs[0];
+            loadDriveFile(doc.id, doc.name);
+          }
+        })
+        .build();
+
+      picker.setVisible(true);
+      setMeta('Picker opened. Choose a JSON file from Drive.');
+    }
+
+    function gapiLoaded() {
+      gapi.load('client:picker', initializeGapiClient);
+    }
+
+    async function initializeGapiClient() {
+      try {
+        await gapi.client.init({
+          apiKey: CONFIG.API_KEY,
+          discoveryDocs: [CONFIG.DISCOVERY_DOC]
+        });
+        state.google.gapiInited = true;
+        state.google.pickerInited = true;
+        maybeEnableAuth();
+      } catch (error) {
+        console.error(error);
+        setMeta('Google API client failed to initialize. Check API key and enabled APIs.');
+      }
+    }
+
+    function gisLoaded() {
+      state.google.tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CONFIG.CLIENT_ID,
+        scope: CONFIG.DRIVE_SCOPE,
+        callback: async (response) => {
+          if (response.error) {
+            console.error(response);
+            setMeta('Google sign-in failed. Check authorized JavaScript origins, test users, and that you opened the app from https://royabhishek99.github.io.');
+            return;
+          }
+          state.google.accessToken = response.access_token;
+          await fetchGoogleProfile();
+          updateControlState();
+          setMeta('Google sign-in complete. Choose or create a Drive file.');
+        }
       });
-      state.agendas[nextKey] = merged;
+      state.google.gisInited = true;
+      maybeEnableAuth();
     }
 
-    function escapeHtml(value) {
-      return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+    function maybeEnableAuth() {
+      if (state.google.gapiInited && state.google.gisInited) {
+        signInBtn.disabled = false;
+      }
+    }
+
+    async function fetchGoogleProfile() {
+      try {
+        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${state.google.accessToken}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          state.google.signedInEmail = data.email || null;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    function handleAuthClick() {
+      if (!state.google.tokenClient) {
+        setMeta('Google auth client is not ready yet. Open the app from https://royabhishek99.github.io, not a preview or file URL.');
+        return;
+      }
+      if (window.location.origin !== ALLOWED_ORIGIN) {
+        setMeta(`Google sign-in only works from ${ALLOWED_ORIGIN}. Open the GitHub Pages URL, not this preview.`);
+        return;
+      }
+      state.google.tokenClient.requestAccessToken({ prompt: 'consent' });
+    }
+
+    function handleSignOut() {
+      if (state.google.accessToken && window.google?.accounts?.oauth2) {
+        google.accounts.oauth2.revoke(state.google.accessToken, () => {});
+      }
+      state.google.accessToken = null;
+      state.google.fileId = null;
+      state.google.fileName = null;
+      state.google.signedInEmail = null;
+      updateControlState();
+      setMeta('Signed out. The calendar still shows your current in-memory data until you reload or load another Drive file.');
     }
 
     prevMonthBtn.addEventListener('click', () => {
@@ -775,6 +1201,11 @@
     clearDayAgendaBtn.addEventListener('click', clearDayAgenda);
     closeDrawerBtn.addEventListener('click', closeDrawer);
     drawerBackdrop.addEventListener('click', closeDrawer);
+    signInBtn.addEventListener('click', handleAuthClick);
+    signOutBtn.addEventListener('click', handleSignOut);
+    pickDriveFileBtn.addEventListener('click', maybeOpenPicker);
+    createDriveFileBtn.addEventListener('click', createDriveFile);
+    syncNowBtn.addEventListener('click', () => saveToDrive('Drive sync complete.'));
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeDrawer();
@@ -795,6 +1226,43 @@
       themeToggle.setAttribute('aria-label', currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
     }
 
+    function carryForwardIncompleteTasks() {
+      const today = new Date();
+      const todayKey = formatDateKey(today);
+
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = formatDateKey(yesterday);
+
+      const yesterdayItems = state.agendas[yesterdayKey];
+      if (!Array.isArray(yesterdayItems) || !yesterdayItems.length) return;
+
+      const remaining = [];
+      const carried = [];
+
+      yesterdayItems.forEach(item => {
+        if (item.done) {
+          remaining.push(item);
+          return;
+        }
+
+        carried.push({
+          ...item,
+          text: item.text.startsWith("Carried forward - ")
+            ? item.text
+            : `Carried forward - ${item.text}`,
+          done: false
+    });
+  });
+
+      if (carried.length) {
+        state.agendas[todayKey] = [...(state.agendas[todayKey] || []), ...carried];
+        state.agendas[yesterdayKey] = remaining;
+      }
+    }
+
+    signInBtn.disabled = true;
+    updateControlState();
     renderChecklistItems();
     renderAgendaList();
     renderCalendar();
